@@ -55,6 +55,7 @@ func (w *Worker) Find(email string) *User {
 }
 
 func main() {
+	// getting input from user
 	email := os.Args[1]
 	// creating the worker
 	w := NewWorker(DataBase)
