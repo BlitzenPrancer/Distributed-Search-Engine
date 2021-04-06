@@ -39,28 +39,29 @@ type Worker struct {
 	users []User
 }
 
-func NewWorker(users []User) *Worker {
-	return &Worker{users: users}
+func NewWorker(users []User, ch chan *User) *Worker {
+	return &Worker{users: users, ch: ch}
 }
 
-func (w *Worker) Find(email string) *User {
+func (w *Worker) Find(email string) {
 	// iterating over the database
 	for i := range w.users {
 		user := &w.users[i]
 		if user.Email == email {
-			return user
+			ch <- user
 		}
 	}
-	return nil
 }
 
 func main() {
 	// getting input from user
 	email := os.Args[1]
+	// creating channels to make the workers access the database asynchornously
+	ch := make(chan *User)
 	// creating the worker
-	w := NewWorker(DataBase)
+	w := NewWorker(DataBase, ch)
 	log.Printf("Looking for %s", email)
-	user := w.Find(email)
+	w.Find(email)
 	if user != nil {
 		log.Printf("The email %s is owned by %s", email, user.Name)
 	} else {
